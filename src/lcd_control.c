@@ -8,6 +8,7 @@
 
 #include "lcd_control.h"
 
+volatile bool lcdInit = 0;
 
 void configureLcdGPIO(void)
 {
@@ -22,6 +23,7 @@ void configureLcdGPIO(void)
 
 	//configurer pins donnees LCD output
 	setLcdBusOutput();
+
 }
 
 void setLcdBusOutput(void)
@@ -70,7 +72,14 @@ void writeLCD(int p_package)
 	GPIOB->ODR |= BIT_RW;
 
 
-	delay(10000);
+    unsigned char flag = 0;
+    if(lcdInit = 0){delay(10000);}
+    else{flag = checkBusyFlag();}
+
+    while (flag)
+    {
+        flag = checkBusyFlag();
+    }
 }
 
 void instructLCD(int p_package)
@@ -87,8 +96,16 @@ void instructLCD(int p_package)
 	GPIOB->ODR &= ~BIT_EN;	// Enable OFF
 	GPIOB->ODR |= (BIT_RS | BIT_RW);
 
+    unsigned char flag = 0;
+    if(lcdInit = 0){delay(10000);}
+    else{flag = checkBusyFlag();}
 
-	delay(10000);
+    while (flag)
+    {
+        flag = checkBusyFlag();
+    }
+    
+	
 }
 
 void configureLCD(void)
@@ -108,5 +125,7 @@ void configureLCD(void)
 	writeLCD(0x45);		// print E
 	writeLCD(0x4D);		// print M
 	instructLCD(0xC0);	// 2nd line
+
+    lcdInit = 1;
 
 }
