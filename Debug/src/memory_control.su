@@ -1,0 +1,4 @@
+memory_control.c:11:6:configureUART	4	static
+memory_control.c:46:6:sendByteUART	16	static
+memory_control.c:52:6:sendStringUART	24	static
+memory_control.c:59:14:receiveByteUART	16	static
