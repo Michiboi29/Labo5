@@ -8,7 +8,7 @@
 
 #include "lcd_control.h"
 
-volatile bool lcdInit = 0;
+volatile int lcdInit = 0;
 
 void configureLcdGPIO(void)
 {
@@ -57,7 +57,7 @@ unsigned char checkBusyFlag(void)
 
 void writeLCD(int p_package)
 {
-	setBusOutput();
+	setLcdBusOutput();
 
 	GPIOB->ODR |= (BIT_EN | BIT_RS);	// Enable ON, RS to high
 	GPIOB->ODR &= ~BIT_RW;
@@ -84,7 +84,7 @@ void writeLCD(int p_package)
 
 void instructLCD(int p_package)
 {
-	setBusOutput();
+	setLcdBusOutput();
 
 	GPIOB->ODR &= ~(BIT_RS | BIT_RW); //RS and RW to 0
 	GPIOB->ODR |= BIT_EN;	// Enable ON

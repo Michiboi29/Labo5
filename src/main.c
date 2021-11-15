@@ -31,10 +31,11 @@ SOFTWARE.
 #include "stm32f4xx.h"
 #include "macros_utiles.h"
 #include "memory_control.h"
+#include "lcd_control.h"
 
 /* Private macro */
 #define TAILLE 67
-uint8_t buffer[30];
+uint8_t buffer[20];
 int indx = 0;
 
 /* Private variables */
@@ -68,6 +69,8 @@ int main(void)
 
 
   configureUART();
+  configureLcdGPIO();
+  configureLCD();
 
 //  unsigned char p_mots[TAILLE];
 //  unsigned char p_erase[TAILLE];

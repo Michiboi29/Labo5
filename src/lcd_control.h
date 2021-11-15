@@ -8,6 +8,7 @@
 #ifndef LCD_CONTROL_H_
 #define LCD_CONTROL_H_
 
+#include "stm32f4xx.h"
 #include "macros_utiles.h"
 
 #define BIT_RS BIT3
