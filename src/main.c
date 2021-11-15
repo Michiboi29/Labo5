@@ -34,6 +34,8 @@ SOFTWARE.
 
 /* Private macro */
 #define TAILLE 67
+uint8_t buffer[30];
+int indx = 0;
 
 /* Private variables */
 /* Private function prototypes */
@@ -67,29 +69,31 @@ int main(void)
 
   configureUART();
 
-  unsigned char p_mots[TAILLE];
-  unsigned char p_erase[TAILLE];
-  unsigned char p_recv[TAILLE];
-  unsigned char p_recv2[TAILLE];
-  unsigned char p_recv3[TAILLE];
+//  unsigned char p_mots[TAILLE];
+//  unsigned char p_erase[TAILLE];
+//  unsigned char p_recv[TAILLE];
+//  unsigned char p_recv2[TAILLE];
+//  unsigned char p_recv3[TAILLE];
+//
+//  for(int iter = 0; iter < TAILLE; iter++)
+//  {
+//	  p_mots[iter] = 'i' + iter;
+//	  p_erase[iter] = 0xff;
+//	  p_recv[iter] = 0;
+//	  p_recv2[iter] =  0;
+//	  p_recv3[iter] =  0;
+//  }
 
-  for(int iter = 0; iter < TAILLE; iter++)
-  {
-	  p_mots[iter] = 'i' + iter;
-	  p_erase[iter] = 0xff;
-	  p_recv[iter] = 0;
-	  p_recv2[iter] =  0;
-	  p_recv3[iter] =  0;
-  }
 
-  unsigned int data = receiveByteUART();
-  int test = 0;
-  int test2 = test;
 
   /* Infinite loop */
   while (1)
   {
 	i++;
+	int data = receiveByteUART();
+	buffer[indx] = data;
+	indx++;
+	if (indx>=30) indx = 0;
 
   }
 }

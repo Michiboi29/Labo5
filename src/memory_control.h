@@ -14,7 +14,7 @@
 void configureUART(void);
 void sendByteUART(uint8_t p_byte);
 void sendStringUART(const char * p_string);
-unsigned int receiveByteUART();
+uint8_t receiveByteUART(void);
 
 
 #endif /* MEMORY_CONTROL_H_ */

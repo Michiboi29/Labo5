@@ -27,17 +27,23 @@ void configureUART(void)
 
 
 	/*****Setup the UART*****/
+
 	RCC ->APB1ENR |=  BIT19; //Give clock to USART4
 
+	UART4->CR1 |= BIT13; //USART enable
+
 	UART4->CR1 &= ~BIT12; // 8 data bits
+
+	UART4->CR1 &= ~BIT10; // no parity
 
 	UART4->CR1 |= BIT3 | BIT2; // receiver and transmitter enable
 
 	UART4->CR2 &= ~(BIT12 | BIT13); // 1 stop bit
 
-	UART4->BRR = (unsigned int)(7.29 * 16); // Formule page 978 du users guide: baud = Fclk/(8*(2-over8)*USARTDIV) ici Fclk est divisé par 4
+	//UART4->BRR = (unsigned int)(7.29 * 16); // Formule page 978 du users guide: baud = Fclk/(8*(2-over8)*USARTDIV) ici Fclk est divisé par 4
 
-	UART4->CR1 |= BIT13; //USART enable
+	UART4->BRR = (unsigned int)(43.75 * 16); //par calcul scientifique
+
 	/*****End setup the UART*****/
 
 }
@@ -56,9 +62,9 @@ void sendStringUART(const char * p_string)
 		sendByteUART(p_string[i++]);
 }
 
-unsigned int receiveByteUART(){
-	unsigned int return_value;
-	while((UART4->SR & BIT5) == 0x0);
+uint8_t receiveByteUART(void){
+	uint8_t return_value;
+	while(!(UART4->SR & BIT5));
 	return_value = UART4->DR;
 	return return_value;
 }
