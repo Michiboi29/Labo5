@@ -7,33 +7,42 @@
 
 #include <command.h>
 
-char readCommand(uint8_t p_buffer[20]){
-	unsigned char cmd = p_buffer[ptr_read];
-	ptr_read ++;
-	if (ptr_read>=20) ptr_read = 0;
-	unsigned char para = p_buffer[ptr_read];
-	ptr_read ++;
-	if (ptr_read>=20) ptr_read = 0;
-	unsigned char chk = p_buffer[ptr_read];
-	ptr_read ++;
-	if (ptr_read>=20) ptr_read = 0;
+char readCommand(){
+	int p_indx = ptr_read;
+	unsigned char cmd = buffer[p_indx++];
+	if (p_indx>=20) p_indx = 0;
+	unsigned char param = buffer[p_indx++];
+	if (p_indx>=20) p_indx = 0;
+	unsigned char chk = buffer[p_indx];
 
-	if((cmd + para + chk) % 256 == 0){
-		return '1';
+	bytesToRead--;
+	ptr_read++;
+	if (ptr_read>=20) ptr_read = 0;
+	if((cmd + param + chk) % 256 != 0){
+		return '0';
 	}
 
-	return '0';
+	if(cmd == 0x41) gereLED(param);
+	else if(cmd == 0x42) eraseLCD();
+	else if(cmd == 0x43) displayCharLCD(param);
+
+	return '1';
 }
 
 void gereLED(uint8_t p_para){
-
+	if(p_para == 0x30){
+		GPIOD->ODR &= ~BIT15;
+	}
+	else if(p_para == 0x31){
+		GPIOD->ODR |= BIT15;
+	}
 }
 
 void eraseLCD(){
 	instructLCD(0xC0);	// 2nd line
 	for (int i = 0; i < 16; i++)
 		writeLCD(0x20); // white space
-	instructLCD(0xC0);	// 2nd line
+	position = 0;
 }
 
 void displayCharLCD(uint8_t p_para){

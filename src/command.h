@@ -14,6 +14,8 @@
 
 extern int ptr_read;
 extern int position;
+extern uint8_t buffer[20];
+extern int bytesToRead;
 
 char readCommand();
 

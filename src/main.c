@@ -28,28 +28,46 @@ SOFTWARE.
 */
 
 /* Includes */
-#include <macros_utiles.h>
-#include <uart.h>
-#include "stm32f4xx.h"
-#include "lcd_control.h"
+
+
 #include <command.h>
+#include <uart.h>
+#include <lcd_control.h>
+#include "stm32f4xx.h"
+#include <macros_utiles.h>
+
 
 /* Private macro */
 /* Private variables */
 uint8_t buffer[20];
 int ptr_write = 0;
 int ptr_read = 0;
+int bytesToRead = 0;
 int position = 0;
-extern timerValue;
+//extern timerValue;
 unsigned int currentTime = 0;
 
 /* Private function prototypes */
 /* Private functions */
+
+volatile unsigned int timerValue = 0;
+
+void TIM2_IRQHandler(void)
+{
+	TIM2->SR &= ~BIT0; // update interupt flag to 0
+	if(timerValue >= 99999)
+	{
+		timerValue = 0;
+	} else {
+		++timerValue;
+	}
+}
 void UART4_IRQHandler(void){
 	uint8_t data = UART4->DR;
 	buffer[ptr_write] = data;
 	ptr_write++;
 	if (ptr_write>=20) ptr_write = 0;
+	bytesToRead++;
 }
 
 
@@ -80,22 +98,24 @@ int main(void)
   configureUART();
   configureLcdGPIO();
   configureLCD();
-//  configureTIM2(10000);
-
+  configureTIM2(1000);
+  // config Led
+  RCC->AHB1ENR |= BIT3;
+  GPIOD->MODER |= BIT30; // set mode de input output
+  GPIOD->MODER &= ~BIT31;
 
   /* Infinite loop */
   while (1)
   {
-	  timerValue = 1000;
-	  displayCharLCD('a');
-	  displayCharLCD('b');
-	  displayCharLCD('c');
-	  eraseLCD();
-//		if(currentTime != timerValue)
-//		{
-//		  currentTime = timerValue;
-//		  writeTime(currentTime);
-//		}
+	  i++;
+
+	  if(currentTime != timerValue)
+	  {
+		  currentTime = timerValue;
+		  writeTime(currentTime);
+	  }
+	  if (bytesToRead >= 3)
+		  readCommand(buffer);
 
   }
 }
