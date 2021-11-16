@@ -1,1 +1,4 @@
 command.c:10:6:readCommand	24	static
+command.c:28:6:gereLED	16	static
+command.c:32:6:eraseLCD	16	static
+command.c:39:6:displayCharLCD	24	static

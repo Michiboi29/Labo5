@@ -32,12 +32,13 @@ SOFTWARE.
 #include <uart.h>
 #include "stm32f4xx.h"
 #include "lcd_control.h"
+#include <command.h>
 
 /* Private macro */
 uint8_t buffer[20];
 int ptr_write = 0;
 int ptr_read = 0;
-int indx = 0;
+int position = 0;
 extern timerValue;
 unsigned int currentTime = 0;
 
@@ -79,17 +80,22 @@ int main(void)
   configureUART();
   configureLcdGPIO();
   configureLCD();
+//  configureTIM2(10000);
 
 
   /* Infinite loop */
   while (1)
   {
-	  i++;
+	  timerValue = 1000;
+	  displayCharLCD('a');
+	  displayCharLCD('b');
+	  displayCharLCD('c');
+	  eraseLCD();
+//		if(currentTime != timerValue)
+//		{
+//		  currentTime = timerValue;
+//		  writeTime(currentTime);
+//		}
 
-    if(currentTime != timerValue)
-    {
-      currentTime = timerValue;
-      writeTime(currentTime);
-    }
   }
 }

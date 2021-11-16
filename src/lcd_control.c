@@ -13,7 +13,12 @@ volatile unsigned int timerValue = 0;
 
 void TIM2_IRQHandler(void)
 {
-	++timerValue;
+	if(timerValue == 99999)
+	{
+		timerValue = 0;
+	} else {
+		++timerValue;
+	}
 }
 
 void configureTIM2(float p_frequence)
@@ -30,7 +35,7 @@ void configureTIM2(float p_frequence)
 	TIM2->DIER |= BIT0;																// peripheral interrupt enable
 
 	TIM2->PSC = prescaler_1;														// prescaler
-	TIM2->ARR = (sys_clk/(prescaler_1*prescaler_2))/(p_frequence/1000);				// set max value (when to interrupt)
+	TIM2->ARR = (sys_clk/(prescaler_1*prescaler_2))/(p_frequence);				// set max value (when to interrupt)
 
 	NVIC->ISER[0] |= BIT28;															// NVIC timer interrupt enable
 
@@ -113,8 +118,8 @@ void writeLCD(int p_package)
 
 void writeTime(unsigned int p_value)
 {
-	instructLCD(0x8F);	// set cursor
-	instructLCD(0x14);	// set left shift
+	instructLCD(0x8A);	// set cursor
+//	instructLCD(0x14);	// set left shift
 	setLcdBusOutput();
 
 	unsigned int intValue = p_value;
@@ -127,12 +132,8 @@ void writeTime(unsigned int p_value)
 		GPIOB->ODR |= (BIT_EN | BIT_RS);	// Enable ON, RS to high
 		GPIOB->ODR &= ~BIT_RW;
 
-		if (value)
-		{
-			GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | ((value + '0') & 0xFF);		//print toSend value
-		} else {
-			GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | ((' ') & 0xFF);				//print toSend value
-		}
+		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | ((value + '0') & 0xFF);		//print toSend value
+
 
 		delay(100);
 		GPIOB->ODR &= ~BIT_EN;	// Enable OFF
@@ -149,7 +150,7 @@ void writeTime(unsigned int p_value)
 		}
 	}
 
-	instructLCD(0x10);	// set right shift
+//	instructLCD(0x10);	// set right shift
 }
 
 void instructLCD(int p_package)
