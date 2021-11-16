@@ -1,32 +1,27 @@
 /*
- * memory_control.c
+ * uart.c
  *
  *  Created on: 14 nov. 2021
  *      Author: Etienne
  */
 
 
-#include "memory_control.h"
+#include <uart.h>
 
 void configureUART(void)
 {
 	//PA.0 USART4_TX
 	//PA.1 USART4.RX
 
-	/*****Setup the pins*****/
 	RCC->AHB1ENR |=  BIT0; //Give clock to GPIOA
 
-	GPIOA->MODER &= ~BIT0; //  PA.0 Alternate function mode
+	GPIOA->MODER &= ~BIT0; //  pin 0Alternate function mode
 	GPIOA->MODER |= BIT1;
 
-	GPIOA->MODER &= ~BIT2; //  PA.1 Alternate function mode
+	GPIOA->MODER &= ~BIT2; //  pin1 Alternate function mode
 	GPIOA->MODER |= BIT3;
 
-	GPIOA->AFR[0] = BIT3 | BIT7; // Activate the alternate function 8 (UART4) for PA.0 and PA.1 (voir table 9 de la datasheet)
-	/*****End setup the pins*****/
-
-
-	/*****Setup the UART*****/
+	GPIOA->AFR[0] = BIT3 | BIT7; // Activate the alternate function 8
 
 	RCC ->APB1ENR |=  BIT19; //Give clock to USART4
 
@@ -34,17 +29,19 @@ void configureUART(void)
 
 	UART4->CR1 &= ~BIT12; // 8 data bits
 
-	UART4->CR1 &= ~BIT10; // no parity
+	UART4->CR1 |= BIT10; // parity control enable
+
+	UART4->CR1 &= ~BIT9; // parrity even
 
 	UART4->CR1 |= BIT3 | BIT2; // receiver and transmitter enable
 
+	UART4->CR1 |= BIT5; // enable interuption at RXNE (RXNEIE)
+
 	UART4->CR2 &= ~(BIT12 | BIT13); // 1 stop bit
 
-	//UART4->BRR = (unsigned int)(7.29 * 16); // Formule page 978 du users guide: baud = Fclk/(8*(2-over8)*USARTDIV) ici Fclk est divisé par 4
+	UART4->BRR = (unsigned int)(43.75 * 16); //par calcul scientifique de baud = Fclk/(8*(2-over8)*USARTDIV)
 
-	UART4->BRR = (unsigned int)(43.75 * 16); //par calcul scientifique
-
-	/*****End setup the UART*****/
+	NVIC->ISER[1] |= BIT20; // position 52 iteruption UART4
 
 }
 
@@ -68,3 +65,5 @@ uint8_t receiveByteUART(void){
 	return_value = UART4->DR;
 	return return_value;
 }
+
+
