@@ -35,6 +35,7 @@ SOFTWARE.
 #include <command.h>
 
 /* Private macro */
+/* Private variables */
 uint8_t buffer[20];
 int ptr_write = 0;
 int ptr_read = 0;
@@ -42,7 +43,6 @@ int position = 0;
 extern timerValue;
 unsigned int currentTime = 0;
 
-/* Private variables */
 /* Private function prototypes */
 /* Private functions */
 void UART4_IRQHandler(void){
