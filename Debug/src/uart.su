@@ -1,0 +1,4 @@
+uart.c:11:6:configureUART	4	static
+uart.c:58:6:sendByteUART	16	static
+uart.c:64:6:sendStringUART	24	static
+uart.c:71:9:receiveByteUART	16	static

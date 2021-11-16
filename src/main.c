@@ -28,14 +28,15 @@ SOFTWARE.
 */
 
 /* Includes */
+#include <macros_utiles.h>
+#include <uart.h>
 #include "stm32f4xx.h"
-#include "macros_utiles.h"
-#include "memory_control.h"
 #include "lcd_control.h"
 
 /* Private macro */
-#define TAILLE 67
 uint8_t buffer[20];
+int ptr_write = 0;
+int ptr_read = 0;
 int indx = 0;
 extern timerValue;
 unsigned int currentTime = 0;
@@ -43,7 +44,12 @@ unsigned int currentTime = 0;
 /* Private variables */
 /* Private function prototypes */
 /* Private functions */
-
+void UART4_IRQHandler(void){
+	uint8_t data = UART4->DR;
+	buffer[ptr_write] = data;
+	ptr_write++;
+	if (ptr_write>=20) ptr_write = 0;
+}
 
 
 /**
@@ -74,38 +80,16 @@ int main(void)
   configureLcdGPIO();
   configureLCD();
 
-//  unsigned char p_mots[TAILLE];
-//  unsigned char p_erase[TAILLE];
-//  unsigned char p_recv[TAILLE];
-//  unsigned char p_recv2[TAILLE];
-//  unsigned char p_recv3[TAILLE];
-//
-//  for(int iter = 0; iter < TAILLE; iter++)
-//  {
-//	  p_mots[iter] = 'i' + iter;
-//	  p_erase[iter] = 0xff;
-//	  p_recv[iter] = 0;
-//	  p_recv2[iter] =  0;
-//	  p_recv3[iter] =  0;
-//  }
-
-
 
   /* Infinite loop */
   while (1)
   {
-	i++;
+	  i++;
 
-  if(currentTime != timerValue)
-  {
-    currentTime = timerValue;
-    writeTime(currentTime);
-  }
-
-	int data = receiveByteUART();
-	buffer[indx] = data;
-	indx++;
-	if (indx>=30) indx = 0;
-
+    if(currentTime != timerValue)
+    {
+      currentTime = timerValue;
+      writeTime(currentTime);
+    }
   }
 }
