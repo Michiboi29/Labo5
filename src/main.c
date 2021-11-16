@@ -37,6 +37,8 @@ SOFTWARE.
 #define TAILLE 67
 uint8_t buffer[20];
 int indx = 0;
+extern timerValue;
+unsigned int currentTime = 0;
 
 /* Private variables */
 /* Private function prototypes */
@@ -93,6 +95,13 @@ int main(void)
   while (1)
   {
 	i++;
+
+  if(currentTime != timerValue)
+  {
+    currentTime = timerValue;
+    writeTime(currentTime);
+  }
+
 	int data = receiveByteUART();
 	buffer[indx] = data;
 	indx++;
