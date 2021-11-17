@@ -24,8 +24,9 @@
 #define BIT_D6 BIT6
 #define BIT_D7 BIT7
 
-void configureTIM2(float p_frequence);
+#define COUNTCOMPARE 1000
 
+void configureTIM2(float p_frequence);
 void configureLcdGPIO(void);
 void setLcdBusOutput(void);
 void setLcdBusInput(void);
@@ -34,7 +35,6 @@ unsigned char checkBusyFlag(void);
 void writeLCD(int p_package);
 void instructLCD(int p_package);
 void configureLCD(void);
-
 void writeTime(unsigned int p_value);
 
 

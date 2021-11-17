@@ -10,27 +10,27 @@
 
 volatile unsigned int lcdInit = 0;
 
-void configureTIM2(float p_frequence)
+void configureTIM3(float p_frequence)
 {
 	volatile int sys_clk = 53760000; //syscoreclk
 	volatile int prescaler_1 = 500; // 1 to 512
 	volatile int prescaler_2 = 2; // prescaller_2 % prescaler_3 = 4/2 = 2
 
-	RCC->APB1ENR |= BIT0;															// clock enable
-	TIM2->CR1 &= ~BIT0;																// clock disable
+	RCC->APB1ENR |= BIT1;															// clock enable
+	TIM3->CR1 &= ~BIT0;																// clock disable
 
-	TIM2->CR1 |= BIT4;																// set as downcounter
+	TIM3->CR1 |= BIT4;																// set as downcounter
 
-	TIM2->DIER |= BIT0;																// peripheral interrupt enable
-	NVIC->ISER[0] |= BIT28;															// NVIC timer interrupt enable
+	TIM3->DIER |= BIT0;																// peripheral interrupt enable
+	NVIC->ISER[0] |= BIT29;															// NVIC timer interrupt enable
 
-	TIM2->PSC = prescaler_1;														// prescaler
-	TIM2->ARR = (sys_clk/(prescaler_1*prescaler_2))/(p_frequence/1000);					// set max value (when to interrupt)
+	TIM3->PSC = prescaler_1;														// prescaler
+	TIM3->ARR = (sys_clk/(prescaler_1*prescaler_2))/(p_frequence);					// set max value (when to interrupt)
 
 
-	TIM2->CR1 |= BIT7;																// auto-reload preload
+	TIM3->CR1 |= BIT7;																// auto-reload preload
 
-	TIM2->CR1 |= BIT0;																// clock start
+	TIM3->CR1 |= BIT0;																// clock start
 }
 
 
@@ -100,7 +100,7 @@ void writeLCD(int p_package)
 
 
     unsigned char flag = 0;
-    if(lcdInit = 0){delay(10000);}
+    if((lcdInit = 0)){delay(10000);}
     else{flag = checkBusyFlag();}
 
     while (flag)
@@ -124,7 +124,7 @@ void instructLCD(int p_package)
 	GPIOB->ODR |= (BIT_RS | BIT_RW);
 
     unsigned char flag = 0;
-    if(lcdInit = 0){delay(10000);}
+    if((lcdInit = 0)){delay(10000);}
     else{flag = checkBusyFlag();}
 
     while (flag)
