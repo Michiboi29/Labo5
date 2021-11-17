@@ -35,6 +35,7 @@ SOFTWARE.
 #include <lcd_control.h>
 #include "stm32f4xx.h"
 #include <macros_utiles.h>
+#include <timer_control.h>
 
 
 /* Private macro */
@@ -44,29 +45,39 @@ int ptr_write = 0;
 int ptr_read = 0;
 int bytesToRead = 0;
 int position = 0;
+
 //extern timerValue;
 unsigned int currentTime = 0;
+unsigned int interruptCount = 0;
+extern unsigned int waitCount;
+extern unsigned int monitoringOn;
 
 /* Private function prototypes */
 /* Private functions */
-
-volatile unsigned int timerValue = 0;
+void TIM3_IRQHandler(void)
+{
+	TIM3->SR &= ~BIT0; // update interupt flag to 0
+	if (monitoringOn){GPIOD->ODR &= ~BIT12;
+//	  GPIOD->ODR &= ~BIT13;
+	  GPIOD->ODR |= BIT14;}
+	interruptCount++;
+	BoucleDAttente(2000);
+}
 
 void TIM2_IRQHandler(void)
 {
-	TIM2->SR &= ~BIT0; // update interupt flag to 0
-	if(timerValue >= 99999)
-	{
-		timerValue = 0;
-	} else {
-		++timerValue;
-	}
+	TIM2->SR &= ~BIT0; // update interrupt flag to 0
+	waitCount = 1;
 }
+
 void UART4_IRQHandler(void){
 	uint8_t data = UART4->DR;
+	if(monitoringOn){GPIOD->ODR &= ~BIT12;
+	  GPIOD->ODR ^= BIT13;
+	  GPIOD->ODR &= ~BIT14;}
 	buffer[ptr_write] = data;
 	ptr_write++;
-	if (ptr_write>=20) ptr_write = 0;
+	if(ptr_write>=20) ptr_write = 0;
 	bytesToRead++;
 }
 
@@ -98,24 +109,41 @@ int main(void)
   configureUART();
   configureLcdGPIO();
   configureLCD();
-  configureTIM2(1000);
+  setupMonitoring();
   // config Led
-  RCC->AHB1ENR |= BIT3;
-  GPIOD->MODER |= BIT30; // set mode de input output
-  GPIOD->MODER &= ~BIT31;
+   RCC->AHB1ENR |= BIT3;
+   GPIOD->MODER |= BIT30; // set mode de input output
+   GPIOD->MODER &= ~BIT31;
+  configureTIM3(1000);
+//  configureTIM2(1000000);
+
+
+
+
 
   /* Infinite loop */
   while (1)
   {
 	  i++;
-
-	  if(currentTime != timerValue)
+	  if(monitoringOn)
 	  {
-		  currentTime = timerValue;
-		  writeTime(currentTime);
+		  GPIOD->ODR |= BIT12;
+//		  GPIOD->ODR &= ~BIT13;
+		  GPIOD->ODR &= ~BIT14;
+	  }
+
+	  if(interruptCount >= COUNTCOMPARE)
+	  {
+		  interruptCount = 0;
+		  writeTime(currentTime++);
 	  }
 	  if (bytesToRead >= 3)
 		  readCommand(buffer);
+
+	  if(monitoringOn)
+	  {
+		  GPIOD->ODR &= ~BIT12;
+	  }
 
   }
 }
